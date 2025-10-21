@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Inder&display=swap');
+@import "tailwindcss";
+
+
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inder", sans-serif;
+}
+
+.titanic-bg {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Dark sea blue gradient */
+  background: linear-gradient(135deg, #0a1f44, #0b2c5f, #0f3a77, #143f8c);
+  background-size: 400% 400%;
+  animation: gradientSea 20s ease infinite;
+  overflow: hidden;
+}
+
+@keyframes gradientSea {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.form-card {
+  background: rgba(0, 28, 60, 0.7);  /* semi-transparent dark blue */
+  backdrop-filter: blur(12px);       /* frosted glass effect */
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 400px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); /* soft shadow */
+  color: #f0f8ff; /* light sea-white text */
+}
+
+
