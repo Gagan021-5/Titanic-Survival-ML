@@ -5,13 +5,15 @@ import shipVideo from "./assets/ship.mp4";
 
 function App() {
   const [form, setForm] = useState({
-    Pclass: "",
-    Sex: "",
+    Pclass: "Third",
+    Sex: "male",
     Age: "",
     SibSp: "",
     Parch: "",
     Fare: "",
+    Embarked: "S", // new field
   });
+
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,15 +23,31 @@ function App() {
     setForm({ ...form, [name]: value });
   };
 
+  const encodeInput = () => {
+    const pclassMap = { First: 1, Second: 2, Third: 3 };
+    const sexMap = { female: 0, male: 1 };
+    const embarkedMap = { S: 0, C: 1, Q: 2 };
+
+    return [
+      pclassMap[form.Pclass],
+      sexMap[form.Sex],
+      Number(form.Age),
+      Number(form.SibSp),
+      Number(form.Parch),
+      Number(form.Fare),
+      embarkedMap[form.Embarked],
+    ];
+  };
+
   const handlePredict = async () => {
     setLoading(true);
     setError("");
     setResult("");
     try {
-      const features = Object.values(form).map(Number);
-      if (features.some(isNaN)) {
-        throw new Error("Please enter valid numbers for all fields.");
-      }
+      console.log("📝 Raw Form Data:", form);
+      const features = encodeInput();
+      if (features.some(isNaN)) throw new Error("Please fill all fields with valid values.");
+
       const res = await axios.post(
         "http://127.0.0.1:5000/predict",
         { features },
@@ -43,169 +61,107 @@ function App() {
     }
   };
 
-  const inputFields = [
-    {
-      name: "Pclass",
-      label: "Passenger Class",
-      min: 1,
-      max: 3,
-      step: 1,
-      placeholder: "Enter class (1-3)",
-    },
-    {
-      name: "Sex",
-      label: "Sex",
-      min: 0,
-      max: 1,
-      step: 1,
-      placeholder: "Enter 0 (female) or 1 (male)",
-    },
-    {
-      name: "Age",
-      label: "Age",
-      min: 0,
-      max: 100,
-      step: 1,
-      placeholder: "Enter age (0-100)",
-    },
-    {
-      name: "SibSp",
-      label: "Siblings/Spouses Aboard",
-      min: 0,
-      max: 8,
-      step: 1,
-      placeholder: "Enter number (0-8)",
-    },
-    {
-      name: "Parch",
-      label: "Parents/Children Aboard",
-      min: 0,
-      max: 6,
-      step: 1,
-      placeholder: "Enter number (0-6)",
-    },
-    {
-      name: "Fare",
-      label: "Fare",
-      min: 0,
-      max: 500,
-      step: 0.01,
-      placeholder: "Enter fare (0-500)",
-    },
-  ];
-
   return (
-    <div className="titanic-bg relative min-h-screen flex items-center justify-center">
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute top-0 left-0 w-full h-full object-cover"
-      >
+    <div className="relative min-h-screen flex items-center justify-center">
+      <video autoPlay loop muted playsInline className="absolute top-0 left-0 w-full h-full object-cover">
         <source src={shipVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
-      <div className="absolute top-0 left-0 w-full h-full bg-black/50"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-black/60"></div>
 
       <motion.div
-        className="form-card relative z-10"
-        initial={{ opacity: 0, scale: 0.85, y: 50 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-      >
-        <h1 className="text-3xl font-bold text-center text-white mb-4">
-          🚢 Titanic Survival Predictor
-        </h1>
-        <p className="text-gray-300 text-center mb-6">
-          Enter passenger details to predict survival
-        </p>
+  className="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 w-[350px] text-white shadow-xl"
+  initial={{ opacity: 0, scale: 0.9, y: 30 }}
+  animate={{ opacity: 1, scale: 1, y: 0 }}
+  transition={{ duration: 1 }}
+>
+  <h1 className="text-2xl font-bold text-center mb-3 ">🚢 Titanic Survival Predictor</h1>
+  <p className="text-gray-300 text-center mb-4 text-sm">
+    Enter passenger details
+  </p>
 
-        <div className="space-y-4">
-          {inputFields.map((field) => (
-            <div key={field.name} className="flex flex-col">
-              <label className="text-sm font-medium text-gray-200">
-                {field.label}
-              </label>
-              <input
-                type="number"
-                name={field.name}
-                value={form[field.name]}
-                onChange={handleChange}
-                min={field.min}
-                max={field.max}
-                step={field.step}
-                placeholder={field.placeholder}
-                className="mt-1 p-2 border border-gray-600 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none bg-gray-900 text-white placeholder-gray-500"
-                aria-label={field.label}
-                disabled={loading}
-              />
-            </div>
-          ))}
-        </div>
+  <div className="mb-3">
+    <label className="text-sm text-gray-200">Class</label>
+    <select
+      name="Pclass"
+      value={form.Pclass}
+      onChange={handleChange}
+      className="mt-1 p-2 w-full rounded-md bg-gray-900 border border-gray-600 text-sm"
+    >
+      <option>First</option>
+      <option>Second</option>
+      <option>Third</option>
+    </select>
+  </div>
 
-        <motion.button
-          onClick={handlePredict}
-          disabled={loading}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className={`w-full mt-6 py-2 px-4 rounded-md text-white font-semibold transition-all duration-200 ${
-            loading
-              ? "bg-blue-700 cursor-not-allowed"
-              : "bg-blue-800 cursor-pointer hover:bg-blue-900"
-          }`}
-        >
-          {loading ? (
-            <span className="flex items-center justify-center">
-              <svg
-                className="animate-spin h-5 w-5 mr-2 text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8h8a8 8 0 11-16 0z"
-                />
-              </svg>
-              Predicting...
-            </span>
-          ) : (
-            "Predict Survival"
-          )}
-        </motion.button>
+  <div className="mb-3">
+    <label className="text-sm text-gray-200">Sex</label>
+    <select
+      name="Sex"
+      value={form.Sex}
+      onChange={handleChange}
+      className="mt-1 p-2 w-full rounded-md bg-gray-900 border border-gray-600 text-sm"
+    >
+      <option>male</option>
+      <option>female</option>
+    </select>
+  </div>
 
-        {error && (
-          <motion.div
-            className="mt-4 p-3 bg-red-600 text-red-100 rounded-md text-center"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            {error}
-          </motion.div>
-        )}
+  <div className="mb-3">
+    <label className="text-sm text-gray-200">Embarked</label>
+    <select
+      name="Embarked"
+      value={form.Embarked}
+      onChange={handleChange}
+      className="mt-1 p-2 w-full rounded-md bg-gray-900 border border-gray-600 text-sm"
+    >
+      <option>S</option>
+      <option>C</option>
+      <option>Q</option>
+    </select>
+  </div>
 
-        {result && (
-          <motion.div
-            className="mt-4 p-3 bg-yellow-600 text-gray-900 rounded-md text-center"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-lg font-semibold">Prediction: {result}</h2>
-          </motion.div>
-        )}
-      </motion.div>
+  {["Age", "SibSp", "Parch", "Fare"].map((field) => (
+    <div key={field} className="mb-3">
+      <label className="text-sm text-gray-200">{field}</label>
+      <input
+        type="number"
+        name={field}
+        value={form[field]}
+        onChange={handleChange}
+        placeholder={`Enter ${field}`}
+        className="mt-1 p-2 w-full rounded-md bg-gray-900 border border-gray-600 text-sm"
+      />
+    </div>
+  ))}
+
+  <motion.button
+    onClick={handlePredict}
+    disabled={loading}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className={`w-full py-2 rounded-md font-semibold transition-all  cursor-pointer ${
+      loading ? "bg-blue-700 cursor-not-allowed" : "bg-blue-800 hover:bg-blue-900"
+    }`}
+  >
+    {loading ? "Predicting..." : "Predict"}
+  </motion.button>
+
+  {error && <div className="mt-3 bg-red-600 text-center p-2 rounded-md text-sm">{error}</div>}
+  {result && (
+    <motion.div
+      className={`mt-3 text-center text-white p-2 rounded-md font-semibold text-sm ${
+        result === "Survived" ? "bg-green-500" : "bg-slate-800"
+      } text-gray-900`}
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      {result}
+    </motion.div>
+  )}
+</motion.div>
+
     </div>
   );
 }
