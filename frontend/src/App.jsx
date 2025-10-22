@@ -17,7 +17,7 @@ function App() {
     defaultValues: {
       Pclass: "Third",
       Sex: "male",
-      Embarked: "S",
+      Embarked: "C",
       Age: "",
       SibSp: "",
       Parch: "",
@@ -65,7 +65,13 @@ function App() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center">
-      <video autoPlay loop muted playsInline className="absolute top-0 left-0 w-full h-full object-cover">
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute top-0 left-0 w-full h-full object-cover"
+      >
         <source src={shipVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
@@ -79,10 +85,13 @@ function App() {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        <h1 className="text-2xl font-bold text-center mb-3">🚢 Titanic Survival Predictor</h1>
-        <p className="text-gray-300 text-center mb-4 text-sm">Enter passenger details</p>
+        <h1 className="text-2xl font-bold text-center mb-3">
+          🚢 Titanic Survival Predictor
+        </h1>
+        <p className="text-gray-300 text-center mb-4 text-sm">
+          Enter passenger details
+        </p>
 
-        {/* Class */}
         <div className="mb-3">
           <label className="text-sm text-gray-200">Class</label>
           <select
@@ -95,7 +104,6 @@ function App() {
           </select>
         </div>
 
-        {/* Sex */}
         <div className="mb-3">
           <label className="text-sm text-gray-200">Sex</label>
           <select
@@ -107,7 +115,6 @@ function App() {
           </select>
         </div>
 
-        {/* Embarked */}
         <div className="mb-3">
           <label className="text-sm text-gray-200">Embarked</label>
           <select
@@ -120,8 +127,7 @@ function App() {
           </select>
         </div>
 
-        {/* Numeric fields */}
-        {["Age", "SibSp", "Parch", "Fare"].map((field) => (
+        {["Age", "Siblings", "Parent & Child", "Total Fare"].map((field) => (
           <div key={field} className="mb-3">
             <label className="text-sm text-gray-200">{field}</label>
             <input
@@ -129,11 +135,18 @@ function App() {
               {...register(field, { required: true, min: 0 })}
               placeholder={`Enter ${field}`}
               className={`mt-1 p-2 w-full rounded-md border text-sm ${
-                errors[field] ? "border-red-500 bg-gray-800" : "border-gray-600 bg-gray-900"
-              } text-white`}
+                errors[field]
+                  ? "border-red-500 bg-gray-800"
+                  : "border-gray-600 bg-gray-900"
+              }  text-white 
+  placeholder-white/50 
+  focus:text-white
+`}
             />
             {errors[field] && (
-              <p className="text-red-500 text-xs mt-1">Please enter a valid {field}</p>
+              <p className="text-red-500 text-xs mt-1">
+                Please enter a valid {field}
+              </p>
             )}
           </div>
         ))}
@@ -144,13 +157,19 @@ function App() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className={`w-full py-2 rounded-md font-semibold transition-all cursor-pointer ${
-            loading ? "bg-blue-700 cursor-not-allowed" : "bg-blue-800 hover:bg-blue-900"
+            loading
+              ? "bg-blue-700 cursor-not-allowed"
+              : "bg-blue-800 hover:bg-blue-900"
           }`}
         >
           {loading ? "Predicting..." : "Predict"}
         </motion.button>
 
-        {error && <div className="mt-3 bg-red-600 text-center p-2 rounded-md text-sm">{error}</div>}
+        {error && (
+          <div className="mt-3 bg-red-600 text-center p-2 rounded-md text-sm">
+            {error}
+          </div>
+        )}
         {result && (
           <motion.div
             className={`mt-3 text-center text-white p-2 rounded-md font-semibold text-sm ${
